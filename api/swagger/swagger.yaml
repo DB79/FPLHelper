@@ -1,0 +1,95 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Fantasy Premier League
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /Points:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: points
+    get:
+      description: returns number of points a team has scored in current GW
+      # used as the method name of the controller
+      operationId: teamPoints
+      parameters:
+        - name: teamID
+          in: query
+          description: FPL squad ID
+          required: true
+          type: integer
+        - name: gameweek
+          in: query
+          description: FPL gameweek
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ScoreResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /TeamPoints:  
+    x-swagger-router-controller: points
+    get:
+      description: returns number of points a team has scored in current GW
+      # used as the method name of the controller
+      operationId: multipleTeamPoints
+      parameters:
+        - name: gameweek
+          in: query
+          description: FPL gameweek
+          required: true
+          type: integer
+        - name: teamId
+          in: query
+          description: ID of pet that needs to be fetched
+          required: true
+          type: array
+          items:
+            type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ScoreResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  ScoreResponse:
+    required: 
+      - score
+    properties:
+      score:
+        type: integer
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
